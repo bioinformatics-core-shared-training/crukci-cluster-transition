@@ -1,6 +1,6 @@
 # CRUKCI Cluster Transition - Hands-on training sessions
 
-4 hands-on training sessions to use the cluster to run analysis @ CRUKCI for complete novice.
+4 hands-on training sessions for using the cluster to run analysis @ CRUKCI for complete novice.
 
 ## What do you need?
 

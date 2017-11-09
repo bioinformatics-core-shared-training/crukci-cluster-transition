@@ -7,6 +7,9 @@ This page hold information about how to use CRUK-CI 2016 cluster.
 
 http://bioinf-wiki001/doku.php?id=newstarters:computationalinfrastructure:clusterone
 
+## References used
+- [LINUX ESSENTIALS](http://faculty.ucr.edu/~tgirke/Documents/UNIX/linux_manual.html)
+
 ## Connecting to Cluster
 
 You first need a cluster account, request one via Helpdesk - IT <ithelpdesk@cruk.cam.ac.uk>.
