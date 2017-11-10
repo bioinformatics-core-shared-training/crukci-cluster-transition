@@ -8,7 +8,7 @@
 - Understand directories' structure
 - Viewing reference genomes
 - Retrieve sequencing data
-- Concatenate datasets
+- Merge datasets
 
 ## Basics, most useful shell commands
 
@@ -46,9 +46,9 @@ $ cd ../../     # moves two directories up (and so on)
 $ cd            # brings you to highest level of your home directory
 ```
 
-> :computer: **EXERCISE** [Download Session 1 data ](https://github.com/bioinformatics-core-shared-training/crukci-cluster-transition/raw/master/session1-data.zip), save file onto your computer and unzip it.
+> :computer: **EXERCISE** [Download Session 1 data ](https://github.com/bioinformatics-core-shared-training/crukci-cluster-transition/raw/master/session1-data.zip), save file onto your computer and unzip it. The downloaded data contains Nelle Nemo's home directory. Nelle Nemo is a marine biologist, she has just returned from a six-month survey of the [North Pacific Gyre](http://en.wikipedia.org/wiki/North_Pacific_Gyre), where she has been sampling gelatinous marine life in the [Great Pacific Garbage Patch](http://en.wikipedia.org/wiki/Great_Pacific_Garbage_Patch).
 >
-> Open a Terminal window, navigate to the downloaded file and enter into its contents, and go to `nelle` directory. Draw a diagram of `nelle`'s directories and files structure. Do not use a graphical interface, only the command line please!
+> Open a Terminal window, navigate to the downloaded file and enter into its contents, go to `nelle` directory. Draw a diagram of `nelle`'s directories and files structure. Do not use a graphical interface, only the command line please!
 >
 > :tada: Congratulations! :thumbsup: You did it! :wink:  
 
@@ -145,7 +145,7 @@ To combine these programs, we use the vertical bar between two commands which is
 $ wc -l <file_names> | sort -n  # standard output of wc is fed directly to the standard input of sort
 ```
 
-> :computer: **EXERCISE** Go back to your Terminal window, or open a new one and navigate to `session1-data/nelle/north-pacific-gyre/2012-07-03`. Nelle Nemo, a marine biologist, has just returned from a six-month survey of the [North Pacific Gyre](http://en.wikipedia.org/wiki/North_Pacific_Gyre), where she has been sampling gelatinous marine life in the [Great Pacific Garbage Patch](http://en.wikipedia.org/wiki/Great_Pacific_Garbage_Patch). She has 300 samples in all, and ran each sample through an assay machine that will measure the relative abundance of 300 different proteins. The machine's output for a single sample is a file with one line for each protein.
+> :computer: **EXERCISE** Go back to your Terminal window, or open a new one and navigate to `session1-data/nelle/north-pacific-gyre/2012-07-03`. Nelle has 300 samples in all, and ran each sample through an assay machine that will measure the relative abundance of 300 different proteins. The machine's output for a single sample is a file with one line for each protein.
 >
 > - How many assay result files does she have?
 > - Could you check that each file has 300 measurements as expected?
@@ -153,7 +153,7 @@ $ wc -l <file_names> | sort -n  # standard output of wc is fed directly to the s
 > :tada: Congratulations! :thumbsup: You did it! :wink:
 
 
-## Folder structures
+## Navigation recap
 
 ![](images/navigation-concepts.png)
 
@@ -164,11 +164,31 @@ $ wc -l <file_names> | sort -n  # standard output of wc is fed directly to the s
 ![](images/moving-data-or-yourself.png)
 
 
-You first need a cluster account, request one via Helpdesk - IT <ithelpdesk@cruk.cam.ac.uk>.
+### Accessing Remote Server
+
+`ssh` (Secure Shell) is a network protocol that allows a secure access over an encrypted connection. Through an SSH connection you can easily manage your files and folders, modify their permissions, edit files directly on the server, configure and install your scripts, etc. `ssh` is used to securely login to a Linux / UNIX host running the sshd daemon on a reachable network.
+
+First, you need a cluster account, request one via Helpdesk - IT <ithelpdesk@cruk.cam.ac.uk>.
+
+Access the cluster at `clust1-headnode.cri.camres.org` using the `ssh` command and your username, press enter and type your password.
 
 ```shell
-ssh clust1-headnode.cri.camres.org
+$ ssh my_username@clust1-headnode.cri.camres.org
 ```
+
+At this point, you are physically on the cluster head node inside your home directory. The directory structure is now completely different to the one you had before and you can no-longer access the files within your file system. However, you can still use the same commands you have seen already. If you now type these commands the outputs will now be specific to you and to the server your are running them on. To return to your computer, use the command `exit`.
+
+```shell
+$ exit
+```
+
+> :computer: **EXERCISE** Go back to your Terminal window, or open a new one and log in onto the cluster head node.
+>
+> - What is the full path of your home directory?
+> - Do you have any files? How many?
+> - Return to your own computer, make sure your hostname is your own machine.
+>
+> :tada: Congratulations! :thumbsup: You did it! :wink:
 
 ## Cluster directories' structure
 
@@ -184,6 +204,15 @@ Large files may need to be stripped to improve performance or files that many jo
 
 Limit number of files in directory, if possible avoid 10,000s files in single directory.
 
+> :computer: **EXERCISE** Go back to your Terminal window, or open a new one and log in onto the cluster head node.
+>
+> - Go to the bioinformatics shared installed software and list what's installed.
+> - Go to one of the scratch spaces to find your lab folder.
+> - Create a directory under your lab folder in the scratch area using your username for its name e.g. `/scratchb/bioinformatics/pajon01`
+>
+> :tada: Congratulations! :thumbsup: You did it! :wink:
+
+
 ## Reference genomes
 
 - Path to reference genomes: `/scratchb/bioinformatics/reference_data/reference_genomes/`
@@ -197,7 +226,46 @@ What Bioinformatics Core maintains:
   - RefFlat format gene model
   - Signal artifact list (if available)
 
+> :computer: **EXERCISE** Go back to your Terminal window, or open a new one and log in onto the cluster head node.
+>
+> - Go to the bioinformatics shared reference genomes and list the assemblies installed for Homo Sapiens.
+>
+> :tada: Congratulations! :thumbsup: You did it! :wink:
+
+
 ## Getting sequencing data
+
+### Downloading Files
+
+The `wget` utility is the best option to **download files from the internet**. It can pretty much handle all complex download situations including large file downloads, recursive downloads, non-interactive downloads, multiple file downloads etc. It retrieves files from World Wide Web (WWW) using widely used protocols like HTTP, HTTPS and FTP, and is designed in such way so that it works in slow or unstable network connections. `wget` can automatically re-start a download where it was left off in case of network problem. Also it downloads file recursively and will keep trying until file has be retrieved completely.
+
+```shell
+$ wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR000/SRR000731/SRR000731.fastq.gz
+```
+
+> :computer: **EXERCISE** Go back to your Terminal window, or open a new one and log in onto the cluster head node.
+>
+> - Go to your directory under your lab folder in the scratch area e.g. `/scratchb/bioinformatics/pajon01`
+> - Download this FASTQ file [ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR000/SRR000731/SRR000731.fastq.gz](ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR000/SRR000731/SRR000731.fastq.gz)
+>
+> :tada: Congratulations! :thumbsup: You did it! :wink:
+
+
+### Copying Files and Directories
+
+`ssh` protocol can also be used to copy files & directories, using the same connection method as above but the command we use is called `scp`.
+
+```shell
+scp -r molecules/ my_username@clust1-headnode.cri.camres.org:/scratchb/xxlab/my_username/
+```
+
+> :computer: **EXERCISE** Go back to your Terminal window, or open a new one and navigate to `session1-data/nelle`.
+>
+> - Copy the `molecules` directory into your directory under your lab folder in the scratch area on the cluster.
+> - Log in to the cluster and navigate to your scratch folder. Check that the molecule files are present.
+>
+> :tada: Congratulations! :thumbsup: You did it! :wink:
+
 
 ### Using CRUKCI infrastructure
 
@@ -207,25 +275,28 @@ http://intranet.cri.camres.org/core-facilities/bioinformatics/sequencing/api
 Save [this file](http://internal-bioinformatics.cruk.cam.ac.uk/software/clarity-tools.jar) to your working area. You can run the tool from the command line with:
 
 ```shell
-wget http://internal-bioinformatics.cruk.cam.ac.uk/software/clarity-tools.jar
-java -jar clarity-tools.jar --help
+$ wget http://internal-bioinformatics.cruk.cam.ac.uk/software/clarity-tools.jar
+$ java -jar clarity-tools.jar --help
 ```
 
-Usage example: `java -jar clarity-tools.jar -l SLX-14572`
+To download all sequencing files associated to your SLX-14572, you can use this command:
 
-### Getting files into and out of the cluster
-
-Use SSH scp (SCoPy) to transfer data
 ```shell
-scp -r data/ clust1-headnode:/scratchb/xxlab/
+$ java -jar /path/to/clarity-tools.jar -l SLX-14572
 ```
 
-Bulk transfers using rsync (delta-transfer algorithm)
-```shell
-rsync -av data/ clust1-headnode:/scratchb/xxlab/data
-```
+> :computer: **EXERCISE** Go back to your Terminal window, or open a new one and log in onto the cluster head node.
+>
+> - Download Clarity tool in your home directory
+> - Navigate to your scratch folder.
+> - Download your preferred project data.
+>
+> :tada: Congratulations! :thumbsup: You did it! :wink:
 
-## Concatenate datasets
+
+## Merging datasets
+
+To merge or concatenate multiple FASTQ files, you do not need to decompress them. It can be done using the `cat` command and redirecting its output to a new file.
 
 ```
 wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR056/ERR056477/ERR056477.fastq.gz
@@ -233,6 +304,14 @@ wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR056/ERR056478/ERR056478.fastq.gz
 
 cat ERR056477.fastq.gz ERR056478.fastq.gz > PRJEB2772.fastq.gz
 ```
+
+> :computer: **EXERCISE** Go back to your Terminal window, or open a new one and log in onto the cluster head node.
+>
+> - Navigate to your scratch folder.
+> - Download two FASTQ files and merge them.
+>
+> :tada: Congratulations! :thumbsup: You did it! :wink:
+
 
 ## Take home message: everyday commands
 
@@ -242,9 +321,9 @@ $ ls            # list directory contents of pwd
 $ cd <dir_name> # changes/switches into specified directory
 
 $ mkdir <dir_name> # creates specified directory
-$ rmdir <dir_name> # removes empty directory
 
 $ nano <file_name> # create a file using the text editor nano
+$ cat <file_name>  # prints the contents of files one after another
 
 $ rm <file_name>   # removes file name
 $ rm -r <dir_name> # removes directory including its content, but asks for confirmation, 'f' argument turns confirmation off
@@ -254,10 +333,11 @@ $ mv <name> <path>   # moves file/directory as specified in path
 
 $ cp <name> <path>   # copy file/directory as specified in path (-r to include content in directories)
 
-$ wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR056/ERR056477/ERR056477.fastq.gz
-$ scp -r molecules/ clust1-headnode:/scratchb/xxlab/
-$ ssh clust1-headnode.cri.camres.org
-$ exit
+$ wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR056/ERR056477/ERR056477.fastq.gz  # download files from the internet
+$ scp -r molecules/ clust1-headnode:/scratchb/xxlab/my_username/               # copy files & directories between different computers
+
+$ ssh my_username@clust1-headnode.cri.camres.org  # access a remote computer
+$ exit                                            # exit ;)
 ```
 
 ## Reference materials
