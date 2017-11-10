@@ -109,12 +109,49 @@ $ Ctrl e                          # cursor to end of command line
 
 ### Filters and pipes
 
-Now that we know a few basic commands, we can finally look at the shell's most powerful feature: the ease with which it lets us combine existing programs in new ways. We'll start with a directory called `molecules` that contains six files describing some simple organic molecules. The `.pdb` extension indicates that these files are in Protein Data Bank format, a simple text format that specifies the type and position of each atom in the molecule. Which of these files is the shortest?
+Now that we know a few basic commands, we can finally look at the shell's most powerful feature: the ease with which it lets us **combine existing programs in new ways**. We'll start with a directory called `molecules` that contains six files describing some simple organic molecules. The `.pdb` extension indicates that these files are in Protein Data Bank format, a simple text format that specifies the type and position of each atom in the molecule. Which of these molecules have the smallest number of atoms?
 
 ```shell
-$ wc -l <file_name> # calculate the number of lines in each input file
-$ ls *.txt          # list files with name matching zero or more characters and with .txt extension
+$ wc -l <file_name> # counts the number of lines in each input file
+$ ls *.txt          # list files with name matching zero or more characters and ends with .txt
 ```
+
+When the shell sees a wildcard, it expands the wildcard to create a **list of matching filenames** before running the command that was asked for.
+
+> :computer: **EXERCISE** Go back to your Terminal window, or open a new one and navigate to `session1-data/nelle/molecules`. So, which of these molecules have the smallest number of atoms?
+>
+> - First, list only the molecules which start with the letter `p`. How many are they?
+> - Now, get the numbers of lines for each molecule. Can you do it with only one command?
+>
+> :tada: Congratulations! :thumbsup: You did it! :wink:
+
+
+Which of these molecules have the smallest number of atoms? It's an easy question to answer when there are only six files, but what if there were 6000? We will **redirect** the output of the command `wc -l` into a file instead of printing it to the screen using the greater than symbol `>`.
+
+```shell
+$ wc -l <file_name> > length.txt  # redirects the command's output to a file length.txt
+$ cat <file_name_a> <file_name_b> # prints the contents of files one after another
+$ sort -n <file_name>             # sorts lines of text file in numerical order instead of alphabetical
+$ head -1 <file_name>             # gets the first line of the file, use -4 to get the first 4 and so on
+```
+
+Instead of creating enormous programs that try to do many different things, Unix programmers focus on creating **lots of simple tools** that each do one job well, and that work well with each other. This programming model is called "pipes and filters".
+
+We've already seen **filters**; a filter is a program like `wc` or `sort` that transforms a stream of input into a stream of output. Almost all of the standard Unix tools can work this way: unless told to do otherwise, they read from **standard input**, do something with what they've read, and write to **standard output**.
+
+To combine these programs, we use the vertical bar between two commands which is called a **pipe** `|`. It tells the shell that we want to use the output of the command on the left as the input to the command on the right.
+
+```shell
+$ wc -l <file_names> | sort -n  # standard output of wc is fed directly to the standard input of sort
+```
+
+> :computer: **EXERCISE** Go back to your Terminal window, or open a new one and navigate to `session1-data/nelle/north-pacific-gyre/2012-07-03`. Nelle Nemo, a marine biologist, has just returned from a six-month survey of the [North Pacific Gyre](http://en.wikipedia.org/wiki/North_Pacific_Gyre), where she has been sampling gelatinous marine life in the [Great Pacific Garbage Patch](http://en.wikipedia.org/wiki/Great_Pacific_Garbage_Patch). She has 300 samples in all, and ran each sample through an assay machine that will measure the relative abundance of 300 different proteins. The machine's output for a single sample is a file with one line for each protein.
+>
+> - How many assay result files does she have?
+> - Could you check that each file has 300 measurements as expected?
+>
+> :tada: Congratulations! :thumbsup: You did it! :wink:
+
 
 ## Folder structures
 
@@ -190,6 +227,40 @@ rsync -av data/ clust1-headnode:/scratchb/xxlab/data
 
 ## Concatenate datasets
 
+```
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR056/ERR056477/ERR056477.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR056/ERR056478/ERR056478.fastq.gz
 
+cat ERR056477.fastq.gz ERR056478.fastq.gz > PRJEB2772.fastq.gz
+```
 
-## Take home message
+## Take home message: everyday commands
+
+```shell
+$ pwd           # present working directory
+$ ls            # list directory contents of pwd
+$ cd <dir_name> # changes/switches into specified directory
+
+$ mkdir <dir_name> # creates specified directory
+$ rmdir <dir_name> # removes empty directory
+
+$ nano <file_name> # create a file using the text editor nano
+
+$ rm <file_name>   # removes file name
+$ rm -r <dir_name> # removes directory including its content, but asks for confirmation, 'f' argument turns confirmation off
+
+$ mv <name1> <name2> # renames directories or files
+$ mv <name> <path>   # moves file/directory as specified in path
+
+$ cp <name> <path>   # copy file/directory as specified in path (-r to include content in directories)
+
+$ wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR056/ERR056477/ERR056477.fastq.gz
+$ scp -r molecules/ clust1-headnode:/scratchb/xxlab/
+$ ssh clust1-headnode.cri.camres.org
+$ exit
+```
+
+## Reference materials
+
+- [The Unix Shell](http://bioinformatics-core-shared-training.github.io/shell-novice/index.html)
+- [LINUX ESSENTIALS](http://faculty.ucr.edu/~tgirke/Documents/UNIX/linux_manual.html)

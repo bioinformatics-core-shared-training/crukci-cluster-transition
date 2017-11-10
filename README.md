@@ -15,3 +15,7 @@
 - [Session 2: Cluster](session2-cluster.md)
 - [Session 3: Analysis steps by steps](session3-analysis.md)
 - [Session 4: Advanced analysis and usage of the cluster](session4-advanced.md)
+
+## Tiny url of this page
+
+- [https://frama.link/crukci-cluster](https://frama.link/crukci-cluster)
