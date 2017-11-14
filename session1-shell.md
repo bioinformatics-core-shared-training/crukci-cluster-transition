@@ -34,6 +34,7 @@ $ hostname # shows on which machine you are
 $ pwd      # present working directory
 
 $ ls       # list directory contents of pwd
+$ ls -F    # list directory contents of pwd with an added slash (`/') immediately after each pathname that is a directory
 $ ls -l    # provides additional info on files and directories
 $ ls -la   # includes hidden files (.name) as well
 $ ls -lat  # lists files in chronological order
@@ -56,6 +57,14 @@ $ cd            # brings you to highest level of your home directory
 
 
 ### Files and directories
+
+Tips on file names:
+* **Do not use spaces**
+  - other options include: underscore (`my_data.txt`), dashes (`my-data.txt`), no separation (`mydata.txt`) or camel case (`MyData.txt`)
+* Avoid **special characters** `~ ! @ # $ % ^ & * ( ) ; < > ? , [] {} ' " |`
+* Use **short file names**
+* Use a **good format for dates** like `YYYYMMDD`, then all your files will always stay in chronological order
+* Add **leading zeros** for clarity and to make sure files sort in sequential order, for example `001, 002, ... 010, 011, ...`
 
 ```shell
 $ mkdir <dir_name> # creates specified directory
@@ -105,6 +114,7 @@ $ <incomplete path/file_name> TAB # completes path/file_name
 $ <incomplete command> SHIFT&TAB  # completes command
 $ Ctrl a                          # cursor to beginning of command line
 $ Ctrl e                          # cursor to end of command line
+$ Ctrl c                          # aborts the execution of a command
 ```
 
 ### Filters and pipes
@@ -194,8 +204,8 @@ $ exit
 
 - Home directory: `/home/$username`
 - Shared installed software: `/home/bioinformatics/software`
-- Scratch/working areas: `/mnt/scratcha` and `/mnt/scratchb`
-- Reference data: `/mnt/scratchb/bioinformatics/reference_data`
+- Scratch/working areas: `/scratcha` and `/scratchb`
+- Reference data: `/scratchb/bioinformatics/reference_data`
 
 The two scratch/working areas are separate but equivalent. These areas are (deliberately) not backed, they are a massively parallel distributed file system
 called Lustre. Pick one to do your work, and to make best use vary which one to use.
