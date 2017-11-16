@@ -227,3 +227,4 @@ See [sbatch](http://slurm.schedmd.com/sbatch.html) man page for all the options 
 
 - [CRUK Bioinformatics Autumn School 2017: Functional Genomics](https://bioinformatics-core-shared-training.github.io/cruk-autumn-school-2017/)
   - [Reference genomes and common file formats, Dóra Bihary, Sept17](https://bioinformatics-core-shared-training.github.io/cruk-autumn-school-2017/Introduction/SS_DB/Materials/Lectures/Lecture1_fileFormats_DB.pdf)
+- [The Unix Shell](http://bioinformatics-core-shared-training.github.io/shell-novice/index.html)
