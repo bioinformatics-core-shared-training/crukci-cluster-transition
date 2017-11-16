@@ -6,7 +6,7 @@
 - Organise data into folders
 - Log in onto the cluster
 - Understand directories' structure
-- Viewing reference genomes
+- View reference genomes
 - Retrieve sequencing data
 - Merge datasets
 
