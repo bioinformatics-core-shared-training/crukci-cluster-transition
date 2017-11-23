@@ -9,6 +9,8 @@
 - A **text editor** -- download [Atom](https://atom.io/) if you do not have one already
 - A **web browser** to access [this page](https://github.com/bioinformatics-core-shared-training/crukci-cluster-transition)
 
+and the ability to **submit jobs onto the cluster**, please check if you can by following instructions on [Can I submit jobs onto the cluster?](can-i-submit-jobs.md) before doing sessions 3 & 4.
+
 ## Where to start?
 
 - [Session 1: Shell](session1-shell.md)
@@ -19,3 +21,14 @@
 ## Tiny url of this page
 
 - [https://frama.link/crukci-cluster](https://frama.link/crukci-cluster)
+
+## Rendering GitHub markdown files locally
+
+https://github.com/joeyespo/grip
+
+```shell
+python3 -m venv venv
+source venv/bin/activate
+pip install grip
+grip session1-shell.md
+```
