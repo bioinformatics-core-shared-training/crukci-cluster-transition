@@ -168,18 +168,33 @@ Let's prepare a small fastQ file to avoid waiting for too long for the alignment
 
 ### ChipSeq - alignment with BWA
 
-BWA can map sequences against a large reference genome, such as the human genome. BWA MEM can map longer sequences (70bp to 1Mbp) and is generally recommended for high-quality queries as it is faster and more accurate.
+[BWA](http://bio-bwa.sourceforge.net/bwa.shtml) can map sequences against a large reference genome, such as the human genome. BWA MEM can map longer sequences (70bp to 1Mbp) and is generally recommended for high-quality queries as it is faster and more accurate.
 
-Our installed version is located in `/home/bioinformatics/software/bwa/bwa-0.7.15/bwa`, to get specific help from the command line for BWA MEM run `/home/bioinformatics/software/bwa/bwa-0.7.15/bwa mem`
+Our installed version is located in `/home/bioinformatics/software/bwa/bwa-0.7.15/bwa`, to get specific help from the command line for BWA MEM run `/home/bioinformatics/software/bwa/bwa-0.7.15/bwa mem` or for general help `/home/bioinformatics/software/bwa/bwa-0.7.15/bwa`.
 
-For 75 bp reads against GRCh38 reference genome, we are going to run:
+For 75 bp reads against GRCh38 reference genome, we are going to run `bwa mem`:
 ```
-/home/bioinformatics/software/bwa/bwa-0.7.15/bwa mem -M -t 4 /scratchb/bioinformatics/reference_data/reference_genomes/homo_sapiens/GRCh38/bwa/hsa.GRCh38 /scratchb/xxlab/my_username/SLX-14572/SLX-14572.i706_i517.HHMJ3BGX3.s_1.r_1.small.fq.gz > /scratchb/xxlab/my_username/SLX-14572/SLX-14572.i706_i517.HHMJ3BGX3.s_1.r_1.small.fq.sam
+/home/bioinformatics/software/bwa/bwa-0.7.15/bwa mem -M -t 4 -R "@RG\tID:1\tLB:SLX-14572.i706_i517\tSM:SLX-14572\tPU:HHMJ3BGX3.1" \
+    /scratchb/bioinformatics/reference_data/reference_genomes/homo_sapiens/GRCh38/bwa/hsa.GRCh38 \
+    /scratchb/xxlab/my_username/SLX-14572/SLX-14572.i706_i517.HHMJ3BGX3.s_1.r_1.small.fq.gz \
+    > /scratchb/xxlab/my_username/SLX-14572/SLX-14572.i706_i517.HHMJ3BGX3.s_1.r_1.small.fq.sam
 ```
-- uses `mem` algorithm
-- `-M` option leaves the best (longest) alignment for a read as is but marks additional alignments for the read as secondary
+- `-M`: leaves the best (longest) alignment for a read as is but marks additional alignments for the read as secondary
 - `-t 4` number of processor cores
+- `-R "@RG\tID:1\tLB:SLX-14572.i706_i517\tSM:SLX-14572\tPU:HHMJ3BGX3.1"` add read group header to identify your aligned reads which will help when merging bam files later, `ID` for identifier, `LB` for library identifier (SLX-ID) and barcode, `SM` for sample name and `PU` for platform unit including flow cell and lane number
 
+The output of BWA is a SAM file, [samtools](http://www.htslib.org/) to convert it to bam format, we will be using `samtools view -b`, our installed version is located here `/home/bioinformatics/software/samtools/samtools-1.6/bin/samtools`. We are going to pipe the output of `bwa mem` into `samtools` to avoid writing multiple files on disk:
+```
+/home/bioinformatics/software/bwa/bwa-0.7.15/bwa mem -R @RG\tID:1\tLB:SLX-14572.i706_i517\tSM:SLX-14572\tPU:HHMJ3BGX3.1 -t 4 \    
+    /scratchb/bioinformatics/reference_data/reference_genomes/homo_sapiens/GRCh38/bwa/hsa.GRCh38 \
+    /scratchb/xxlab/my_username/SLX-14572/SLX-14572.i706_i517.HHMJ3BGX3.s_1.r_1.small.fq.gz \
+    | /home/bioinformatics/software/samtools/samtools-1.6/bin/samtools view -b \
+    > /scratchb/xxlab/my_username/SLX-14572/alignment/SLX-14572.i706_i517.HHMJ3BGX3.s_1.r_1.small.fq.bam
+```
+
+To view the header of your aligned reads, you can use `samtools view -H my_file.bam` or to view some aligned reads use `samtools view my_file.bam | tail -10`.
+
+If you have short sequence reads (< 70bp), you will need to run two steps `bwa aln` followed by `bwa samse` for single end or `bwa sampe` for paired end data.
 
 > :computer: **EXERCISE** Go to your Terminal window, or open a new one and log in onto the cluster head node.
 >
@@ -192,22 +207,105 @@ For 75 bp reads against GRCh38 reference genome, we are going to run:
 >
 > :tada: Congratulations! :thumbsup: You did it! :wink:
 
-If you're getting failled job, you may wish to check if you have enough disk space on your scratch space using:
+If you're getting failed job, you may wish to check that you have enough disk space on your scratch space using:
 ```
 lfs quota -h /scratchb/xxlab/
 ```
 
 ### RNASeq - alignment with TopHat
 
+- See [TopHat](http://ccb.jhu.edu/software/tophat/index.shtml) documentation.
+- Our installed version is located here `/home/bioinformatics/software/tophat/tophat-2.1.1/tophat`
+- Running TopHat:
+  ```
+  tophat \
+      --GTF $GeneAnnotationFile \
+      --bowtie1 --min-anchor "3" --num-threads "4" \
+      --tmp-dir $TempDirectory \
+      --output $OutputDirectory \
+      $TopHatIndexPrefix  \
+      $FastqFile
 
-## Alignment quality control, sort and mark duplicates using Picard
+  $GeneAnnotationFile=
+  /scratchb/bioinformatics/reference_data/reference_genomes/homo_sapiens/hg38/annotation/hsa.hg38.gtf
 
-https://broadinstitute.github.io/picard/command-line-overview.html
-```
-java -jar /home/bioinformatics/software/picard/picard-2.14.0/picard.jar --help
-```
+  $TopHatIndexPrefix=
+  /scratchb/bioinformatics/reference_data/reference_genomes/homo_sapiens/hg38/tophat/hsa.hg38
+  ```
 
-## Take home message: everyday commands
+> :computer: **EXERCISE** Go to your Terminal window, or open a new one and log in onto the cluster head node.
+>
+> - Navigate to your project data.
+> - Create an new `alignment_tophat` directory
+> - Create a new `job.sh` to run tophat on the small fastQ file `SLX-14572.i706_i517.HHMJ3BGX3.s_1.r_1.small.fq`
+> - Send job to the cluster
+> - Check the output while running
+> - Update your `README.txt` file with what you've done while job is running
+>
+> :tada: Congratulations! :thumbsup: You did it! :wink:
+
+
+## Viewing alignment data
+
+- Aligned sequence formats: SAM/BAM/CRAM
+- SAM format stands for Sequence Alignment Map format and it is the standard format for aligned sequence data which is recognised by the majority of software and browsers
+
+Explore alignment data files from [SAM/BAM and related specifications](http://samtools.github.io/hts-specs/) and the [SAM Format Specification](http://samtools.github.io/hts-specs/SAMv1.pdf).
+
+## Alignment quality metrics, sort and mark duplicates using Picard tools
+
+- See [Picard tools](http://broadinstitute.github.io/picard/) documentation.
+- Our installed version is located here `/home/bioinformatics/software/picard/picard-2.14.0/picard.jar`, you need `java` installed
+- Running Picard tools:
+  - Alignment Metrics
+  ```
+  java -jar PICARDJAR CollectAlignmentSummaryMetrics \
+      I=InputBam \
+      O=OutputMetricsFile \
+      REF_FLAT=GenomeReferenceInFASTA
+  ```
+  - InsertSize Metrics
+  ```
+  java -jar PICARDJAR CollectInsertSizeMetrics \
+      I=InputBam \
+      O=OutputMetricsFile \
+      H=OutputHistogramPlotPDF \
+      VALIDATION_STRINGENCY=SILENT
+  ```
+  - Sort bam
+  ```
+  java -jar PICARDJAR SortSam \
+      I=InputBam \
+      O=OutputBam \
+      SORT_ORDER=coordinate - One of {unsorted, queryname, coordinate, duplicate, unknown}
+  ```
+  - Mark Duplicates (keep or delete)
+  ```
+  java -jar PICARDJAR MarkDuplicates \
+      I=InputBam \
+      O=OutputBam \
+      M=OutputMetricsFile \
+      REMOVE_DUPLICATES=false
+  ```
+  - RNAseq Metrics
+  ```
+  java -jar PICARDJAR CollectRnaSeqMetrics \
+      I=InputBam \
+      O=OutputMetricsFile \
+      REF_FLAT=GenomeReferenceInFASTA \
+      STRAND_SPECIFICITY="NONE" \
+      ASSUME_SORTED="false"  \ (true is quicker)
+      VALIDATION_STRINGENCY=SILENT
+  ```
+  - WGS metrics
+  ```
+  java -jar PICARDJAR CollectWgsMetrics \
+      I=InputBam \
+      O=OutputMetricsFile \
+      REF_FLAT=GenomeReferenceInFASTA
+  ```
+
+## Take home message: everyday cluster commands
 
 ```
 sbatch job.sh
