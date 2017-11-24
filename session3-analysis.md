@@ -252,6 +252,11 @@ lfs quota -h /scratchb/xxlab/
 
 Explore alignment data files from [SAM/BAM and related specifications](http://samtools.github.io/hts-specs/) and the [SAM Format Specification](http://samtools.github.io/hts-specs/SAMv1.pdf).
 
+To view the header of your aligned reads, you can use `samtools view -H my_file.bam` or to view some aligned reads use `samtools view my_file.bam | tail -10`.
+
+- See [samtools](http://www.htslib.org/) document for more information.
+- Our installed version is located here `/home/bioinformatics/software/samtools/samtools-1.6/bin/samtools`.
+
 ## Alignment quality metrics, sort and mark duplicates using Picard tools
 
 - See [Picard tools](http://broadinstitute.github.io/picard/) documentation.
