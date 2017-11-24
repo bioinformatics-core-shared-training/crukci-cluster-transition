@@ -115,6 +115,16 @@ If you wish to kill your job before it completes, run [scancel](http://slurm.sch
 scancel JobID
 ```
 
+> :computer: **EXERCISE** Go to your Terminal window, or open a new one and log in onto the cluster head node.
+>
+> - Navigate to your project data.
+> - Run FastQC for all your sequencing files in your project by sending a job per file to the cluster
+> - Wait for the results
+> - Update your `README.txt` file with what you've done
+> - View the html report in a web browser, you may have to copy back this file on your own computer to be able to view it using the `scp` command or mount your scratch space using `sshfs`
+>
+> :tada: Congratulations! :thumbsup: You did it! :wink:
+
 
 ## Take home message: everyday cluster commands
 
