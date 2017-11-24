@@ -1,6 +1,6 @@
 # CRUKCI Cluster Transition - Hands-on training sessions
 
-4 hands-on training sessions for using the cluster to run analysis @ CRUKCI for complete novice.
+5 hands-on training sessions for using the cluster to run analysis @ CRUKCI for complete novice.
 
 ## What do you need?
 
@@ -9,14 +9,15 @@
 - A **text editor** -- download [Atom](https://atom.io/) if you do not have one already
 - A **web browser** to access [this page](https://github.com/bioinformatics-core-shared-training/crukci-cluster-transition)
 
-and the ability to **submit jobs onto the cluster**, please check if you can by following instructions on [Can I submit jobs onto the cluster?](can-i-submit-jobs.md) before doing sessions 3 & 4.
+and the ability to **submit jobs onto the cluster**, please check if you can by following instructions on [Can I submit jobs onto the cluster?](can-i-submit-jobs.md) before doing sessions 3, 4 & 5.
 
 ## Where to start?
 
 - [Session 1: Shell](session1-shell.md)
 - [Session 2: Cluster](session2-cluster.md)
-- [Session 3: Analysis steps by steps](session3-analysis.md)
-- [Session 4: Advanced analysis and usage of the cluster](session4-advanced.md)
+- [Session 3: Usage of cluster](session3-cluster-usage.md)
+- [Session 4: Analysis steps by steps](session4-analysis.md)
+- [Session 5: Advanced analysis and usage of the cluster](session5-advanced.md)
 
 ## Tiny url of this page
 
