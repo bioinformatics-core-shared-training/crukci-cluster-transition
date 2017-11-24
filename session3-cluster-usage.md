@@ -1,4 +1,4 @@
-# Session 3: Usage of cluster
+# Session 3: Usage of the cluster
 
 
 ## Learning Objectives

@@ -15,7 +15,7 @@ and the ability to **submit jobs onto the cluster**, please check if you can by 
 
 - [Session 1: Shell](session1-shell.md)
 - [Session 2: Cluster](session2-cluster.md)
-- [Session 3: Usage of cluster](session3-cluster-usage.md)
+- [Session 3: Usage of the cluster](session3-cluster-usage.md)
 - [Session 4: Analysis steps by steps](session4-analysis.md)
 - [Session 5: Advanced analysis and usage of the cluster](session5-advanced.md)
 
