@@ -79,7 +79,7 @@ For 75 bp reads against GRCh38 reference genome, we are going to run `bwa mem`:
 
 The output of BWA is a SAM file, [samtools](http://www.htslib.org/) to convert it to bam format, we will be using `samtools view -b`, our installed version is located here `/home/bioinformatics/software/samtools/samtools-1.6/bin/samtools`. We are going to pipe the output of `bwa mem` into `samtools` to avoid writing multiple files on disk:
 ```
-/home/bioinformatics/software/bwa/bwa-0.7.15/bwa mem -R @RG\tID:1\tLB:SLX-14572.i706_i517\tSM:SLX-14572\tPU:HHMJ3BGX3.1 -t 4 \    
+/home/bioinformatics/software/bwa/bwa-0.7.15/bwa mem -M -t 4 -R "@RG\tID:1\tLB:SLX-14572.i706_i517\tSM:SLX-14572\tPU:HHMJ3BGX3.1" \    
     /scratchb/bioinformatics/reference_data/reference_genomes/homo_sapiens/GRCh38/bwa/hsa.GRCh38 \
     /scratchb/xxlab/my_username/SLX-14572/SLX-14572.i706_i517.HHMJ3BGX3.s_1.r_1.small.fq.gz \
     | /home/bioinformatics/software/samtools/samtools-1.6/bin/samtools view -b \
