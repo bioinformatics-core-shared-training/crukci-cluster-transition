@@ -1,1 +1,4 @@
 session1-data/*
+.Rproj.user
+venv/
+r/
