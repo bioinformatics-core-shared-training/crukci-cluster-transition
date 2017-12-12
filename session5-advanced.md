@@ -89,7 +89,7 @@ Running featureCounts generates two output file `SLX-14572.FourSamples.featureCo
 
 - Read count data in R
   ```R
-  countdata <- read.csv("data/SLX-12345.AllSamples.featureCounts", comment.char = "#")
+  countdata <- read.delim("data/SLX-12345.AllSamples.featureCounts", skip=1)
   View(countdata)
   ```
 
