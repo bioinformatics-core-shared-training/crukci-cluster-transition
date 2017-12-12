@@ -83,13 +83,13 @@ Running featureCounts generates two output file `SLX-14572.FourSamples.featureCo
 
 - Read sample information in R
   ```R
-  samplesheet <- read.csv("data/samplesheet_RNAseq.csv")
+  samplesheet <- read.csv("data/samplesheet.SLX-12345.csv")
   View(samplesheet)
   ````
 
 - Read count data in R
   ```R
-  countdata <- read.csv("data/SLX-12763.AllSamples.featureCounts", comment.char = "#")
+  countdata <- read.csv("data/SLX-12345.AllSamples.featureCounts", comment.char = "#")
   View(countdata)
   ```
 
