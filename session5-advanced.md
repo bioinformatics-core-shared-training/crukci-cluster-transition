@@ -75,7 +75,43 @@ head /scratchb/bioinformatics/reference_data/reference_genomes/homo_sapiens/GRCh
 
 ## Analysis of ChIP-seq data
 
+- Mapping reads on genome using bwa
+- Quality Control using ChIPQC
+- Peak Calling with MACS2
+- Peak Annotation using ChIPseeker
+- Motif Analysis using Meme Suite
+- Normalisation implemented in DiffBind
+- Differential Binding Analysis implemented in DiffBind using DeSeq2
+
 ### Peak Calling using MACS2
+
+Once our reads have been aligned against the genome, we need to identify regions of enrichment (peaks). There are a variety of tools 
+available for calling peaks: SICER, MACS2, EPIC, Enriched Domain Detector (EDD), BayesPeak etc. Here we will use MACS2.
+
+Different  types of ChIP data have differently shaped  peaks. Generally, TF peaks are narrow, whilst epignomic data, such as histone marks,
+can be narrow, broad, or a mixture of both. It is important to use a peak caller that is appropriate for the peak type being sought. MACS2 has
+both narrow and broad modes and so is widely applicable.
+
+When calling peaks for a sample it is also necessary to provide an appropriate input (control) sample. This is a negative control that will allow
+the peak caller to estimate the background signal. Some peak callers will work without an input sample but this is **not** recommended.
+
+- MACS2 can be downloaded [here](https://github.com/taoliu/MACS)
+- Our installed version is located here **....**
+- Add this tool onto your path `ln -s /home/bioinformatics/software/... ~/bin/.`
+- Running it:
+	- Make a directory for the output files `mkdir macs`
+	- Run the tool:
+```
+macs2 callpeak \
+    --treatment **ChIPsample.bam** \
+    --control **InputSample.bam** \
+    --gsize "2671858539" \
+    --outdir "macs" \
+    --name "JC2371" `
+```
+- MACS2 has a large number of options and arguments, the above is a default narrow peak analysis.
+- Note the `--gsize` argument - this is the "effective genome size" - this parameter is dependent on the read length and the actual genome size, 
+please see the MACS documentation for further details.
 
 ### Peak Annotation
 

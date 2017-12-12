@@ -1,0 +1,12 @@
+Status	../samplebam/HBR-500-1.bam	../samplebam/HBR-500-2.bam	../samplebam/HBR-500-3.bam	../samplebam/HBR-500-4.bam	../samplebam/UHR-500-1.bam	../samplebam/UHR-500-2.bam	../samplebam/UHR-500-3.bam	../samplebam/UHR-500-4.bam
+Assigned	7303347	9040900	9144959	8270905	9587348	8798791	8669310	7628458
+Unassigned_Ambiguity	465421	588425	576445	565446	691778	619290	630053	533525
+Unassigned_MultiMapping	0	0	0	0	0	0	0	0
+Unassigned_NoFeatures	523273	606389	628456	727077	1090400	925930	1035153	846413
+Unassigned_Unmapped	145586	180294	165042	193022	213933	183090	188840	169552
+Unassigned_MappingQuality	0	0	0	0	0	0	0	0
+Unassigned_FragmentLength	0	0	0	0	0	0	0	0
+Unassigned_Chimera	0	0	0	0	0	0	0	0
+Unassigned_Secondary	1796221	2203668	2068482	1869674	2265272	2397307	2444118	1749280
+Unassigned_Nonjunction	0	0	0	0	0	0	0	0
+Unassigned_Duplicate	0	0	0	0	0	0	0	0
