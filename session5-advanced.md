@@ -1,5 +1,14 @@
 # Session 5: Advanced analysis and usage of the cluster
 
+## Learning Objectives
+
+- Analysis of RNA-seq data including
+  - Run Feature counts
+  - Read counts data in R
+  - Run differential expression analysis
+  - Add annotations
+- Overview of tools for analysis of ChIP-seq data
+
 
 ## Analysis of RNA-seq data
 
