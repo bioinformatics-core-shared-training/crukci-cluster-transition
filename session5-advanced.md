@@ -234,6 +234,12 @@ There are a number of ways to add annotation, but we will demonstrate how to do 
   View(results)
   ```
 
+### Writing results file to disk
+
+```
+write.csv(results, "data/SLX-12345.DEGresultsTable.csv", quote=FALSE, row.names=FALSE)
+```
+
 ## Analysis of ChIP-seq data
 
 - Mapping reads on genome using bwa

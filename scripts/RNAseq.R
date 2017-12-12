@@ -86,3 +86,6 @@ columns(org.Mm.eg.db)
 ann <- select(org.Mm.eg.db, keytype="ENSEMBL", keys=rownames(results), columns=c("ENSEMBL","SYMBOL","GENENAME"))
 results <- merge(x=results, y=ann, by= "ENSEMBL", all.x=TRUE)
 View(results)
+
+# Write results file to disk
+write.csv(results, "data/SLX-12345.DEGresultsTable.csv", quote=FALSE, row.names=FALSE)
