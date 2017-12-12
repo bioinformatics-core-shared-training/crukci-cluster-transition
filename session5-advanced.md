@@ -6,6 +6,7 @@
   - Run Feature counts
   - Read counts data in R
   - Run differential expression analysis
+  - Add annotations
 - Overview of tools for analysis of ChIP-seq data
 
 
@@ -73,20 +74,34 @@ Running featureCounts generates two output file `SLX-14572.FourSamples.featureCo
 
 - Learn R with [Half-day introduction to the R language crash course](https://bioinformatics-core-shared-training.github.io/r-crash-course/)
 
+- Install package dependencies for RNAseq analysis in R
+  ```
+  source("https://bioconductor.org/biocLite.R")
+  biocLite("edgeR")
+  biocLite("org.Hs.eg.db")
+  ```
+
 - Read sample information in R
   ```
-  sampleinfo <- read.table("data/samplesheet_RNAseq.csv", sep=',', header=TRUE)
-  View(sampleinfo)
-  sampleinfo
-  ```
+  samplesheet <- read.csv("data/samplesheet_RNAseq.csv")
+  View(samplesheet)
+  ````
 
 - Read count data in R
   ```
-  countdata <- read.table("data/SLX-12763.AllSamples.featureCounts", sep=',', header=TRUE, comment.char = '#')
-  head(countdata)
+  countdata <- read.csv("data/SLX-12763.AllSamples.featureCounts", comment.char = "#")
   View(countdata)
-  dim(countdata)
   ```
+
+### Data manipulations
+
+Convert Gene names into row names, remove columns, and rename columns
+```
+rownames(countdata) <- countdata$Geneid
+countdata <- countdata[,-(1:6)]
+samplesheet$CountTableNames <- gsub("[/-]", ".", samplesheet$BamFile)
+colnames(countdata) <- samplesheet$SampleName[match(colnames(countdata), samplesheet$CountTableNames)]
+```
 
 ### Filtering out low expressed genes
 
@@ -100,7 +115,6 @@ Genes with very low counts across all libraries provide little evidence for diff
   ```
 - Load it
   ```
-  library(limma)
   library(edgeR)
   ```
 
@@ -131,23 +145,13 @@ Genes with very low counts across all libraries provide little evidence for diff
   dgeObj <- calcNormFactors(dgeObj)
   ```
 
-- Obtain corrected sample information
-  ```
-  group <- paste(sampleinfo$CellType,sampleinfo$Status,sep=".")
-  ```
-
 ### Create the design matrix
 
-First we need to create a design matrix for the groups. We have two variables, status and cell type. We will fit two models under two assumptions; no interaction of these two factors.
-
 ```
-# Create the two variables
-group <- as.character(group)
-type <- sapply(strsplit(group, ".", fixed=T), function(x) x[1])
-status <- sapply(strsplit(group, ".", fixed=T), function(x) x[2])
-# Specify a design matrix with an intercept term
-design <- model.matrix(~ type + status)
-design
+# Create the groups
+groups <- samplesheet$Source
+# Specify a design matrix
+design <- model.matrix(~groups)
 ```
 
 ### Differential expression with edgeR
@@ -165,20 +169,61 @@ design
   ```
   plotBCV(dgeObj)
   ```
-- Testing for differential expression
+- Fit the linear model
   ```
-  # Fit the linear model
   fit <- glmFit(dgeObj, design)
   names(fit)
-  head(coef(fit
-  # Conduct likelihood ratio tests
-  lrt.BvsL <- glmLRT(fit, coef=2)
-  topTags(lrt.BvsL)
+  head(coef(fit))
   ```
-- Visualisation of the results of a DE analysis using plotSmear from edgeR: this plot shows the log-fold change against log-counts per million, with DE genes highlighted
+- Conduct likelihood ratio test
+  ```
+  qlf <- glmQLFTest(fit, coef=2)
+  de <- decideTestsDGE(qlf)
+  summary(de)
+  ```
+- Visualise the results using plotSmear
   ```
   detags <- rownames(dgeObj)[as.logical(de)]
-  plotSmear(lrt.BvsL, de.tags=detags)
+  plotSmear(qlf, de.tags=detags)
+  ```
+
+### Output table
+
+- Extract table from `qlf` object
+```
+results <- qlf$table
+results$ENSEMBL <- rownames(results)
+View(results)
+```
+- Adjust p-value
+```
+results$Padj <- p.adjust(results$PValue, method="BH")
+results <- results[order(results$Padj),]
+View(results)
+```
+
+### Add annotations
+
+There are a number of ways to add annotation, but we will demonstrate how to do this using the `org.Mm.eg.db` package. This package is one of several organism-level packages which are re-built every 6 months. These packages are listed on the [annotation section](http://bioconductor.org/packages/release/BiocViews.html#___AnnotationData) of the Bioconductor, and are installed in the same way as regular Bioconductor packages.
+
+- To install this package in RStudio
+  ```
+  source("https://bioconductor.org/biocLite.R")
+  biocLite("org.Hs.eg.db")
+  ```
+- Load it
+  ```
+  library(org.Hs.eg.db)
+  ```
+- View columns
+  ```
+  columns(org.Hs.eg.db)
+  ```
+- Add gene description to the results table
+  ```
+  ann <- select(org.Hs.eg.db,keytype="ENSEMBL", keys=rownames(results), columns=c("ENSEMBL","SYMBOL","GENENAME"))
+  results <- merge(x=results, y=ann, by= "ENSEMBL", all.x=TRUE)
+  View(results)
   ```
 
 ## Analysis of ChIP-seq data
@@ -196,15 +241,12 @@ design
 Once our reads have been aligned against the genome, we need to identify regions of enrichment (peaks). There are a variety of tools
 available for calling peaks: SICER, MACS2, EPIC, Enriched Domain Detector (EDD), BayesPeak etc. Here we will use MACS2.
 
-Different  types of ChIP data have differently shaped  peaks. Generally, TF peaks are narrow, whilst epignomic data, such as histone marks,
-can be narrow, broad, or a mixture of both. It is important to use a peak caller that is appropriate for the peak type being sought. MACS2 has
-both narrow and broad modes and so is widely applicable.
+Different  types of ChIP data have differently shaped  peaks. Generally, TF peaks are narrow, whilst epignomic data, such as histone marks, can be narrow, broad, or a mixture of both. It is important to use a peak caller that is appropriate for the peak type being sought. MACS2 has both narrow and broad modes and so is widely applicable.
 
-When calling peaks for a sample it is also necessary to provide an appropriate input (control) sample. This is a negative control that will allow
-the peak caller to estimate the background signal. Some peak callers will work without an input sample but this is **not** recommended.
+When calling peaks for a sample it is also necessary to provide an appropriate input (control) sample. This is a negative control that will allow the peak caller to estimate the background signal. Some peak callers will work without an input sample but this is **not** recommended.
 
 - MACS2 can be downloaded [here](https://github.com/taoliu/MACS)
-- Our installed version is located here **....**
+- Our installed version is located here **...** (not yet installed)
 - Add this tool onto your path `ln -s /home/bioinformatics/software/... ~/bin/.`
 - Running it:
 	- Make a directory for the output files `mkdir macs`
