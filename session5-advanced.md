@@ -99,7 +99,7 @@ Convert Gene names into row names, remove columns, and rename columns
 ```
 rownames(countdata) <- countdata$Geneid
 countdata <- countdata[,-(1:6)]
-samplesheet$CountTableNames <- gsub("[/-]", ".", samplesheet$BamFile)
+samplesheet$CountTableNames <- gsub("-", ".", samplesheet$BamFile)
 colnames(countdata) <- samplesheet$SampleName[match(colnames(countdata), samplesheet$CountTableNames)]
 ```
 
@@ -149,7 +149,7 @@ Genes with very low counts across all libraries provide little evidence for diff
 
 ```
 # Create the groups
-groups <- samplesheet$Source
+groups <- samplesheet$Group
 # Specify a design matrix
 design <- model.matrix(~groups)
 ```
@@ -202,6 +202,14 @@ results <- results[order(results$Padj),]
 View(results)
 ```
 
+### Volcano plot
+
+```
+deg <- which(results$Padj<=0.05)
+plot(results$logFC, -log10(results$Padj), pch=21, col="black", bg="black", xlab="log2(FoldChange)", ylab="-log10(adjusted p-value)")
+points(results$logFC[deg], -log10(results$Padj[deg]), pch=21, col="black", bg="red")
+```
+
 ### Add annotations
 
 There are a number of ways to add annotation, but we will demonstrate how to do this using the `org.Mm.eg.db` package. This package is one of several organism-level packages which are re-built every 6 months. These packages are listed on the [annotation section](http://bioconductor.org/packages/release/BiocViews.html#___AnnotationData) of the Bioconductor, and are installed in the same way as regular Bioconductor packages.
@@ -209,15 +217,15 @@ There are a number of ways to add annotation, but we will demonstrate how to do 
 - To install this package in RStudio
   ```
   source("https://bioconductor.org/biocLite.R")
-  biocLite("org.Hs.eg.db")
+  biocLite("org.Mm.eg.db")
   ```
 - Load it
   ```
-  library(org.Hs.eg.db)
+  library(org.Mm.eg.db)
   ```
 - View columns
   ```
-  columns(org.Hs.eg.db)
+  columns(org.Mm.eg.db)
   ```
 - Add gene description to the results table
   ```
