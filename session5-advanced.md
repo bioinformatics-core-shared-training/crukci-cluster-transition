@@ -215,7 +215,7 @@ macs2 callpeak \
     --control **InputSample.bam** \
     --gsize "2671858539" \
     --outdir "macs" \
-    --name "JC2371" `
+    --name "ChIPSampleName" `
 ```
 - MACS2 has a large number of options and arguments, the above is a default narrow peak analysis.
 - Note the `--gsize` argument - this is the "effective genome size" - this parameter is dependent on the read length and the actual genome size,
