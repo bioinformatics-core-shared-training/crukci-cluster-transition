@@ -78,7 +78,7 @@ Running featureCounts generates two output file `SLX-14572.FourSamples.featureCo
   ```R
   source("https://bioconductor.org/biocLite.R")
   biocLite("edgeR")
-  biocLite("org.Hs.eg.db")
+  biocLite("org.Mm.eg.db")
   ```
 
 - Read sample information in R
