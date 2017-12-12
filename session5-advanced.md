@@ -6,7 +6,6 @@
   - Run Feature counts
   - Read counts data in R
   - Run differential expression analysis
-  - Add annotations
 - Overview of tools for analysis of ChIP-seq data
 
 
@@ -17,6 +16,7 @@
 - Normalisation implemented in edgeR
 - Differential expression using DESeq2
 - Functional annotation using Blast2GO
+
 
 ### Counting
 
@@ -40,38 +40,146 @@ head /scratchb/bioinformatics/reference_data/reference_genomes/homo_sapiens/GRCh
       -t exon \
       -g gene_id \
       -a Homo_sapiens.GRCh38.84.gtf \
-      -o SLX-14572.i706_i517.featureCounts \
-      SLX-14572.i706_i517.HHMJ3BGX3.s_1.r_1.small.fq.bam
+      -o SLX-14572.FourSamples.featureCounts \
+      SLX-14572.i706_i517.HHMJ3BGX3.s_1.r_1.small.fq.bam SLX-14572.i706_i502.HHMJ3BGX3.s_1.r_1.small.fq.bam SLX-14572.i706_i503.HHMJ3BGX3.s_1.r_1.small.fq.bam SLX-14572.i703_i517.HHMJ3BGX3.s_1.r_1.small.fq.bam
   ```
   - `--primary` only count primary alignment
   - `-C` do not count reads where the pairs are mapped to different chromosomes
   - `-t exon` the feature type to count reads against, in this case exons
   - `-g gene_id` the attribute type to summarise counts by, in this case the gene ID
 
+Running featureCounts generates two output file `SLX-14572.FourSamples.featureCounts` `SLX-14572.FourSamples.featureCounts.summary`.
+- The summary table reports the numbers of unassigned reads and the reasons why they are not assigned (eg. ambiguity, multi-mapping, secondary alignment, mapping quality, fragment length, chimera, read duplicate, non-junction and so on), in addition to the number of successfully assigned reads for each library.
+- The full results table has multiple columns:
+  - column 1: the gene identifier
+  - columns 2-5: the genes location
+  - column 6: the length of the gene
+  - column 7-10: the number of reads assigned to the gene
+
+### Reading the count data in R
+
+- Download and install [RStudio](https://www.rstudio.com/)
+- [Get cluster file systems mounted on your macOS](session3-cluster-usage.md#get-cluster-file-systems-mounted-on-your-macos)
+- Download [GitHub crukci-cluster-transition data](https://github.com/bioinformatics-core-shared-training/crukci-cluster-transition/archive/master.zip)
+- Unzip `crukci-cluster-transition-master.zip`
+
+- Set up an RStudio project:
+  - Menu *File* > *New Project...*
+  - *New Directory* > *Empty Project*
+  - **Directory name:** type **.**
+  - **Create project as subdirectory of:** click *Browse...*
+  - and select the directory `crukci-cluster-transition-master`, click *Open*
+  - click *Create Project*
+
+- Learn R with [Half-day introduction to the R language crash course](https://bioinformatics-core-shared-training.github.io/r-crash-course/)
+
+- Read sample information in R
+  ```
+  sampleinfo <- read.table("data/samplesheet_RNAseq.csv", sep=',', header=TRUE)
+  View(sampleinfo)
+  sampleinfo
+  ```
+
+- Read count data in R
+  ```
+  countdata <- read.table("data/SLX-12763.AllSamples.featureCounts", sep=',', header=TRUE, comment.char = '#')
+  head(countdata)
+  View(countdata)
+  dim(countdata)
+  ```
+
 ### Filtering out low expressed genes
 
+Genes with very low counts across all libraries provide little evidence for differential expression and they interfere with some of the statistical approximations that are used later in the pipeline.
+
 - See `cpm` function from [edgeR package](http://www.bioconductor.org/packages/release/bioc/html/edgeR.html)
-- To install this package, open RStudio
+- To install this package in RStudio
   ```
   source("https://bioconductor.org/biocLite.R")
   biocLite("edgeR")
   ```
 - Load it
   ```
-  load(limma)
-  load(edgeR)
+  library(limma)
+  library(edgeR)
   ```
-- Use it:
+
+- Calculate the Counts Per Million measure
   ```
-  countdata <- read.delim("/Users/pajon01/mnt/scratchb/SLX-14572/featurecounts/SLX-14572.i706_i517.featureCounts", stringsAsFactors = FALSE, comment.char = '#')
   cpmdata <- cpm(countdata)
   head(cpmdata)
   ```
+- Identify genes with at least 0.5 cpm in at least 2 samples
+  ```
+  thresh <- cpmdata > 0.5
+  keep <- rowSums(thresh) >= 2
+  ```
+- Subset the rows of countdata to keep the more highly expressed genes
+  ```
+  counts.keep <- countdata[keep,]
+  ```
+
+### Converting counts to DGEList object
+
+- Convert to an edgeR object
+  ```
+  dgeObj <- DGEList(counts.keep)
+  ```
+
+- Perform TMM normalisation
+  ```
+  dgeObj <- calcNormFactors(dgeObj)
+  ```
+
+- Obtain corrected sample information
+  ```
+  group <- paste(sampleinfo$CellType,sampleinfo$Status,sep=".")
+  ```
+
+### Create the design matrix
+
+First we need to create a design matrix for the groups. We have two variables, status and cell type. We will fit two models under two assumptions; no interaction of these two factors.
+
+```
+# Create the two variables
+group <- as.character(group)
+type <- sapply(strsplit(group, ".", fixed=T), function(x) x[1])
+status <- sapply(strsplit(group, ".", fixed=T), function(x) x[2])
+# Specify a design matrix with an intercept term
+design <- model.matrix(~ type + status)
+design
+```
 
 ### Differential expression with edgeR
 
-### Adding annotations
-
+- Estimating the overall dispersion
+  ```
+  dgeObj <- estimateCommonDisp(dgeObj)
+  ```
+- Estimating gene-wise dispersion estimates
+  ```
+  dgeObj <- estimateGLMTrendedDisp(dgeObj)
+  dgeObj <- estimateTagwiseDisp(dgeObj)
+  ```
+- Plot the estimated dispersions
+  ```
+  plotBCV(dgeObj)
+  ```
+- Testing for differential expression
+  ```
+  # Fit the linear model
+  fit <- glmFit(dgeObj, design)
+  names(fit)
+  head(coef(fit
+  # Conduct likelihood ratio tests
+  lrt.BvsL <- glmLRT(fit, coef=2)
+  topTags(lrt.BvsL)
+  ```
+- Visualisation of the results of a DE analysis using plotSmear from edgeR: this plot shows the log-fold change against log-counts per million, with DE genes highlighted
+  ```
+  detags <- rownames(dgeObj)[as.logical(de)]
+  plotSmear(lrt.BvsL, de.tags=detags)
+  ```
 
 ## Analysis of ChIP-seq data
 
@@ -85,7 +193,7 @@ head /scratchb/bioinformatics/reference_data/reference_genomes/homo_sapiens/GRCh
 
 ### Peak Calling using MACS2
 
-Once our reads have been aligned against the genome, we need to identify regions of enrichment (peaks). There are a variety of tools 
+Once our reads have been aligned against the genome, we need to identify regions of enrichment (peaks). There are a variety of tools
 available for calling peaks: SICER, MACS2, EPIC, Enriched Domain Detector (EDD), BayesPeak etc. Here we will use MACS2.
 
 Different  types of ChIP data have differently shaped  peaks. Generally, TF peaks are narrow, whilst epignomic data, such as histone marks,
@@ -110,7 +218,7 @@ macs2 callpeak \
     --name "JC2371" `
 ```
 - MACS2 has a large number of options and arguments, the above is a default narrow peak analysis.
-- Note the `--gsize` argument - this is the "effective genome size" - this parameter is dependent on the read length and the actual genome size, 
+- Note the `--gsize` argument - this is the "effective genome size" - this parameter is dependent on the read length and the actual genome size,
 please see the MACS documentation for further details.
 
 ### Peak Annotation
