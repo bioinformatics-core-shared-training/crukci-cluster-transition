@@ -75,20 +75,20 @@ Running featureCounts generates two output file `SLX-14572.FourSamples.featureCo
 - Learn R with [Half-day introduction to the R language crash course](https://bioinformatics-core-shared-training.github.io/r-crash-course/)
 
 - Install package dependencies for RNAseq analysis in R
-  ```
+  ```R
   source("https://bioconductor.org/biocLite.R")
   biocLite("edgeR")
   biocLite("org.Hs.eg.db")
   ```
 
 - Read sample information in R
-  ```
+  ```R
   samplesheet <- read.csv("data/samplesheet_RNAseq.csv")
   View(samplesheet)
   ````
 
 - Read count data in R
-  ```
+  ```R
   countdata <- read.csv("data/SLX-12763.AllSamples.featureCounts", comment.char = "#")
   View(countdata)
   ```
@@ -96,7 +96,7 @@ Running featureCounts generates two output file `SLX-14572.FourSamples.featureCo
 ### Data manipulations
 
 Convert Gene names into row names, remove columns, and rename columns
-```
+```R
 rownames(countdata) <- countdata$Geneid
 countdata <- countdata[,-(1:6)]
 samplesheet$CountTableNames <- gsub("-", ".", samplesheet$BamFile)
@@ -109,45 +109,45 @@ Genes with very low counts across all libraries provide little evidence for diff
 
 - See `cpm` function from [edgeR package](http://www.bioconductor.org/packages/release/bioc/html/edgeR.html)
 - To install this package in RStudio
-  ```
+  ```R
   source("https://bioconductor.org/biocLite.R")
   biocLite("edgeR")
   ```
 - Load it
-  ```
+  ```R
   library(edgeR)
   ```
 
 - Calculate the Counts Per Million measure
-  ```
+  ```R
   cpmdata <- cpm(countdata)
   head(cpmdata)
   ```
 - Identify genes with at least 0.5 cpm in at least 2 samples
-  ```
+  ```R
   thresh <- cpmdata > 0.5
   keep <- rowSums(thresh) >= 2
   ```
 - Subset the rows of countdata to keep the more highly expressed genes
-  ```
+  ```R
   counts.keep <- countdata[keep,]
   ```
 
 ### Converting counts to DGEList object
 
 - Convert to an edgeR object
-  ```
+  ```R
   dgeObj <- DGEList(counts.keep)
   ```
 
 - Perform TMM normalisation
-  ```
+  ```R
   dgeObj <- calcNormFactors(dgeObj)
   ```
 
 ### Create the design matrix
 
-```
+```R
 # Create the groups
 groups <- samplesheet$Group
 # Specify a design matrix
@@ -157,32 +157,32 @@ design <- model.matrix(~groups)
 ### Differential expression with edgeR
 
 - Estimating the overall dispersion
-  ```
+  ```R
   dgeObj <- estimateCommonDisp(dgeObj)
   ```
 - Estimating gene-wise dispersion estimates
-  ```
+  ```R
   dgeObj <- estimateGLMTrendedDisp(dgeObj)
   dgeObj <- estimateTagwiseDisp(dgeObj)
   ```
 - Plot the estimated dispersions
-  ```
+  ```R
   plotBCV(dgeObj)
   ```
 - Fit the linear model
-  ```
+  ```R
   fit <- glmFit(dgeObj, design)
   names(fit)
   head(coef(fit))
   ```
 - Conduct likelihood ratio test
-  ```
+  ```R
   qlf <- glmQLFTest(fit, coef=2)
   de <- decideTestsDGE(qlf)
   summary(de)
   ```
 - Visualise the results using plotSmear
-  ```
+  ```R
   detags <- rownames(dgeObj)[as.logical(de)]
   plotSmear(qlf, de.tags=detags)
   ```
@@ -190,13 +190,13 @@ design <- model.matrix(~groups)
 ### Output table
 
 - Extract table from `qlf` object
-```
+```R
 results <- qlf$table
 results$ENSEMBL <- rownames(results)
 View(results)
 ```
 - Adjust p-value
-```
+```R
 results$Padj <- p.adjust(results$PValue, method="BH")
 results <- results[order(results$Padj),]
 View(results)
@@ -204,7 +204,7 @@ View(results)
 
 ### Volcano plot
 
-```
+```R
 deg <- which(results$Padj<=0.05)
 plot(results$logFC, -log10(results$Padj), pch=21, col="black", bg="black", xlab="log2(FoldChange)", ylab="-log10(adjusted p-value)")
 points(results$logFC[deg], -log10(results$Padj[deg]), pch=21, col="black", bg="red")
@@ -215,20 +215,20 @@ points(results$logFC[deg], -log10(results$Padj[deg]), pch=21, col="black", bg="r
 There are a number of ways to add annotation, but we will demonstrate how to do this using the `org.Mm.eg.db` package. This package is one of several organism-level packages which are re-built every 6 months. These packages are listed on the [annotation section](http://bioconductor.org/packages/release/BiocViews.html#___AnnotationData) of the Bioconductor, and are installed in the same way as regular Bioconductor packages.
 
 - To install this package in RStudio
-  ```
+  ```R
   source("https://bioconductor.org/biocLite.R")
   biocLite("org.Mm.eg.db")
   ```
 - Load it
-  ```
+  ```R
   library(org.Mm.eg.db)
   ```
 - View columns
-  ```
+  ```R
   columns(org.Mm.eg.db)
   ```
 - Add gene description to the results table
-  ```
+  ```R
   ann <- select(org.Hs.eg.db,keytype="ENSEMBL", keys=rownames(results), columns=c("ENSEMBL","SYMBOL","GENENAME"))
   results <- merge(x=results, y=ann, by= "ENSEMBL", all.x=TRUE)
   View(results)
