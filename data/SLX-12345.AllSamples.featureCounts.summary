@@ -1,0 +1,12 @@
+Status	CtrlHyp_A_2.bam	CtrlHyp_B_2.bam	CtrlHyp_C_2.bam	Hypoxia_A_2.bam	Hypoxia_B_2.bam	Hypoxia_C_2.bam
+Assigned	19943252	17169474	13256449	15760209	16339054	19929050
+Unassigned_Ambiguity	693928	607957	466367	545262	584121	700748
+Unassigned_MultiMapping	0	0	0	0	0	0
+Unassigned_NoFeatures	1681733	1416497	1138039	1338137	1373507	1846538
+Unassigned_Unmapped	904511	679476	537549	566468	655399	853129
+Unassigned_MappingQuality	0	0	0	0	0	0
+Unassigned_FragmentLength	0	0	0	0	0	0
+Unassigned_Chimera	0	0	0	0	0	0
+Unassigned_Secondary	8707261	7763088	5915454	6499832	7034655	8105529
+Unassigned_Nonjunction	0	0	0	0	0	0
+Unassigned_Duplicate	0	0	0	0	0	0

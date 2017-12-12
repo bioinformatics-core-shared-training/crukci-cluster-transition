@@ -1,0 +1,7 @@
+SampleName,SLXId,Barcode,Group,Replicate,BamFile
+Control_1,SLX-12345,D712-D508,Control,1,SLX-12345.D712-D508.C34EQACPX.s_2.tophat.mus_musculus.bam
+Control_2,SLX-12345,D702-D508,Control,2,SLX-12345.D702-D508.C34EQACPX.s_2.tophat.mus_musculus.bam
+Control_3,SLX-12345,D712-D504,Control,3,SLX-12345.D712-D504.C34EQACPX.s_2.tophat.mus_musculus.bam
+Treatment_1,SLX-12345,D702-D502,Treatment,1,SLX-12345.D702-D502.C34EQACPX.s_2.tophat.mus_musculus.bam
+Treatment_2,SLX-12345,D701-D502,Treatment,2,SLX-12345.D701-D502.C34EQACPX.s_2.tophat.mus_musculus.bam
+Treatment_3,SLX-12345,D701-D507,Treatment,3,SLX-12345.D701-D507.C34EQACPX.s_2.tophat.mus_musculus.bam

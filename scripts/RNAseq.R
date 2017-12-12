@@ -3,16 +3,16 @@ library(edgeR)
 options(stringsAsFactors = FALSE)
 
 # read sample information
-samplesheet <- read.csv("data/samplesheet_RNAseq.csv")
+samplesheet <- read.csv("data/samplesheet.SLX-12345.csv")
 View(samplesheet)
 # read count data (output of featureCounts tool)
-countdata <- read.csv("data/SLX-12763.AllSamples.featureCounts", comment.char = "#")
+countdata <- read.delim("data/SLX-12345.AllSamples.featureCounts", skip=1)
 View(countdata)
 
 # data manipulations
 rownames(countdata) <- countdata$Geneid
 countdata <- countdata[,-(1:6)]
-samplesheet$CountTableNames <- gsub("[/-]", ".", samplesheet$BamFile)
+samplesheet$CountTableNames <- gsub("-", ".", samplesheet$BamFile)
 colnames(countdata) <- samplesheet$SampleName[match(colnames(countdata), samplesheet$CountTableNames)]
 View(countdata)
 
@@ -34,7 +34,7 @@ dgeObj <- DGEList(counts.keep)
 dgeObj <- calcNormFactors(dgeObj)
 
 # Create the design matrix
-groups <- samplesheet$Source
+groups <- samplesheet$Group
 design <- model.matrix(~groups)
 View(design)
 
@@ -73,11 +73,16 @@ results$Padj <- p.adjust(results$PValue, method="BH")
 results <- results[order(results$Padj),]
 View(results)
 
+# Volcano plot
+deg <- which(results$Padj<=0.05)
+plot(results$logFC, -log10(results$Padj), pch=21, col="black", bg="black", xlab="log2(FoldChange)", ylab="-log10(adjusted p-value)")
+points(results$logFC[deg], -log10(results$Padj[deg]), pch=21, col="black", bg="red")
+
 # Load annotation library
-library(org.Hs.eg.db)
-columns(org.Hs.eg.db)
+library(org.Mm.eg.db)
+columns(org.Mm.eg.db)
 
 # Add gene description to the results table
-ann <- select(org.Hs.eg.db,keytype="ENSEMBL", keys=rownames(results), columns=c("ENSEMBL","SYMBOL","GENENAME"))
+ann <- select(org.Mm.eg.db, keytype="ENSEMBL", keys=rownames(results), columns=c("ENSEMBL","SYMBOL","GENENAME"))
 results <- merge(x=results, y=ann, by= "ENSEMBL", all.x=TRUE)
 View(results)
