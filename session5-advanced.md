@@ -1,4 +1,4 @@
-# Session 5: Advanced analysis and usage of the cluster
+# Session 5: Advanced analysis and downstream analysis in R
 
 ## Learning Objectives
 
