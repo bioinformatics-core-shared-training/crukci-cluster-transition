@@ -6,3 +6,6 @@ gems:
 readme_index:
   enabled:          true
   remove_originals: false
+
+plugins:
+  - jemoji
