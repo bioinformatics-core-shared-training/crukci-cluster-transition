@@ -2,6 +2,7 @@ theme: jekyll-theme-minimal
 
 gems:
   - jekyll-readme-index
+  - jemoji
   
 readme_index:
   enabled:          true
