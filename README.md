@@ -21,11 +21,13 @@ and the ability to **submit jobs onto the cluster**, please check if you can by 
 
 ## Tiny url of this page
 
-- [https://frama.link/crukci-cluster](https://frama.link/crukci-cluster)
+- [https://frama.link/crukci-cluster-web](https://frama.link/crukci-cluster-web)
+
+Course materiels is accessible: [https://frama.link/crukci-cluster](https://frama.link/crukci-cluster)
 
 ## Rendering GitHub markdown files locally
 
-https://github.com/joeyespo/grip
+[https://github.com/joeyespo/grip](https://github.com/joeyespo/grip)
 
 ```shell
 python3 -m venv venv
